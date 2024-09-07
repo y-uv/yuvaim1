@@ -13,7 +13,6 @@ const QuickAimGame = () => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'finished'>('waiting');
   const [startTime, setStartTime] = useState<number | null>(null);
-  const [endTime, setEndTime] = useState<number | null>(null);
   const [targetCount, setTargetCount] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -39,7 +38,6 @@ const QuickAimGame = () => {
     } else if (gameState === 'playing') {
       if (targetCount === 9) {
         const endTimeNow = Date.now();
-        setEndTime(endTimeNow);
         setGameState('finished');
         setTargets([]);
         setElapsedTime((endTimeNow - (startTime || 0)) / 1000);
@@ -55,7 +53,6 @@ const QuickAimGame = () => {
     setGameState('waiting');
     setTargets([generateTarget()]);
     setStartTime(null);
-    setEndTime(null);
     setTargetCount(0);
     setElapsedTime(0);
     setShowConfetti(false);
