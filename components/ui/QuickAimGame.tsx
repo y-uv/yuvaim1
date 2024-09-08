@@ -16,6 +16,18 @@ const QuickAimGame = () => {
   const [targetCount, setTargetCount] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [randomQuote, setRandomQuote] = useState<string>('');
+
+  const quotes = [
+    "even tumbleweeds gotta start somewhere",
+    "sometimes the bullet hits, sometimes it don't",
+    "even a slow horse can win the race if the other fella falls asleep",
+    "looks like you’re aiming like a blind coyote in the fog",
+    "if aimin' was easy, even you could do it right",
+    "reckon the target's safe for another day",
+    "ain't no shame, long as you pretend you were aiming somewhere else",
+    "you shoot like you’re trying to give the air a warning",
+  ];
 
   const generateTarget = useCallback(() => {
     const x = Math.random() * 360;
@@ -42,12 +54,13 @@ const QuickAimGame = () => {
         setTargets([]);
         setElapsedTime((endTimeNow - (startTime || 0)) / 1000);
         setShowConfetti(true); // Trigger confetti when game finishes
+        setRandomQuote(quotes[Math.floor(Math.random() * quotes.length)]); // Set random quote
       } else {
         setTargets([generateTarget()]);
         setTargetCount(prev => prev + 1);
       }
     }
-  }, [gameState, targetCount, generateTarget, startGame, startTime]);
+  }, [gameState, targetCount, generateTarget, startGame, startTime, quotes]);
 
   const resetGame = useCallback(() => {
     setGameState('waiting');
@@ -56,6 +69,7 @@ const QuickAimGame = () => {
     setTargetCount(0);
     setElapsedTime(0);
     setShowConfetti(false);
+    setRandomQuote(''); // Reset quote
   }, [generateTarget]);
 
   useEffect(() => {
@@ -75,7 +89,7 @@ const QuickAimGame = () => {
   const formatTime = (time: number) => time.toFixed(2);
 
   return (
-    <div className="flex flex-col cursor-crosshair items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col cursor-crosshair items-center justify-center min-h-screen bg-white p-4">
       <style jsx global>{`
         .game-area {
           cursor: crosshair;
@@ -90,12 +104,10 @@ const QuickAimGame = () => {
           </p>
         )}
         {gameState === 'finished' && (
-          <p className="text-lg text-black">
-            final time: {formatTime(elapsedTime)} seconds
-          </p>
+          <p className="text-lg text-black">final time: {formatTime(elapsedTime)} seconds</p>
         )}
       </div>
-      <div className="relative w-[400px] h-[400px] border-4 border-black border-dotted mb-6 game-area">
+      <div className="relative w-[400px] h-[400px] border-4 border-black border-dotted mb-2 game-area">
         <div className="absolute inset-0">
           {targets.map((target, index) => (
             <div
@@ -114,13 +126,20 @@ const QuickAimGame = () => {
           ))}
         </div>
       </div>
-      <div className="h-10"> {/* Fixed height container for the button */}
-        {gameState === 'finished' && (
-          <Button onClick={resetGame} className="bg-neutral-500 hover:bg-neutral-700">
-            run it back
-          </Button>
-        )}
+      <div className="relative w-full h-0">
+      {gameState === 'finished' && (
+      <div className="flex flex-col items-center mt-1 space-y-1 w-full max-w-2xl mx-auto">
+      <div className="relative inline-block">
+        <blockquote className="text-center font-bold text-black bg-white px-6 py-3 text-lg font-mono whitespace-nowrap">
+          {randomQuote}
+        </blockquote>
       </div>
+        <Button onClick={resetGame} className="bg-neutral-500 hover:bg-neutral-600">
+          run it back
+        </Button>
+      </div>
+    )}
+    </div>
       {showConfetti && <Confetti width={innerWidth} height={innerHeight} numberOfPieces={200} recycle={false} tweenDuration={20000}/>}
     </div>
   );
